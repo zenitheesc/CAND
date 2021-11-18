@@ -29,8 +29,13 @@ CAN::CAN(std::string name):interface_name{name} {
         
 int CAN::socket_write (struct can_frame *frame) {
 
-    if (write(file_descriptor, frame, sizeof(struct can_frame)) < 0) {
-        perror("Write");
+    try{
+        int vl = write(file_descriptor, frame, sizeof(struct can_frame));
+        if(vl<0){
+            throw vl;
+        }
+    }catch(int ex){
+        std::cerr<<"Write error";
         return 1;
     }
 
@@ -40,18 +45,17 @@ int CAN::socket_write (struct can_frame *frame) {
 CAN& operator<<(CAN& can,struct can_frame *frame) {
 
     int nbytes;
+    try{
+        nbytes = read(can.file_descriptor, frame, sizeof(struct can_frame));
+        throw nbytes;
+    }catch(int ex){
+        if (nbytes < 0) {
+            std::cerr<<"Read error";
+        }	
 
-    nbytes = read(can.file_descriptor, frame, sizeof(struct can_frame));
-
-    if (nbytes < 0) {
-        perror("Read error");
-        return can;
-    }	
-
-    if (nbytes < sizeof(struct can_frame)) {
-        fprintf(stderr, "read: incomplete CAN frame\n");
-        // callbacks
-        return can;
+        if (nbytes < sizeof(struct can_frame)) {
+            std::cerr<<"Read: incomplete CAN frame"<<std::endl;
+        }
     }
     return can;
 
@@ -59,8 +63,13 @@ CAN& operator<<(CAN& can,struct can_frame *frame) {
 
 int CAN::socket_close () {
 
-    if (close(file_descriptor) < 0) {
-        perror("Closing error"); // exceptions
+    try{
+        int vl = close(file_descriptor);
+        if(vl<0){
+            throw vl;
+        }
+    }catch(int ex){
+        std::cerr<<"Closing error";
         return 1;
     }
 
