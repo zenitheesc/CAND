@@ -24,6 +24,15 @@ CAN::CAN(std::string name):m_interfaceName{name} {
     m_fileDescriptor = socketCan;
 
 }
+struct can_frame CAN::getCanFrame(){
+    return m_frame;
+}
+int CAN::getFileDescriptor(){
+    return m_fileDescriptor;
+}
+void CAN::setCanFrame(struct can_frame frame){
+    this->m_frame=frame;
+}
         
 void CAN::socket_write (struct can_frame *frame) {
 
@@ -36,7 +45,7 @@ void CAN::socket_write (struct can_frame *frame) {
 CAN& operator<<(CAN& can,struct can_frame *frame) {
 
     int nbytes;
-    nbytes = read(can.m_fileDescriptor, frame, sizeof(struct can_frame));
+    nbytes = read(can.getFileDescriptor(), frame, sizeof(struct can_frame));
     if (nbytes < 0) {
         throw std::runtime_error("Read error");
     }	
@@ -45,7 +54,7 @@ CAN& operator<<(CAN& can,struct can_frame *frame) {
         throw std::runtime_error("Read: Incomplete CAN frame");
     }
 
-    can.m_frame=(*frame);
+    can.setCanFrame(*frame);
 
     return can;
 
@@ -61,11 +70,11 @@ void CAN::socket_close () {
 }
 
 std::ostream& operator<<(std::ostream& os,CAN& can){
-    os<<std::hex<<std::showbase<<(int)can.m_frame.can_id<<" [";
-    os<<std::dec<<(int)can.m_frame.can_dlc<<"]";
+    os<<std::hex<<std::showbase<<(int)can.getCanFrame().can_id<<" [";
+    os<<std::dec<<(int)can.getCanFrame().can_dlc<<"]";
     os<<std::noshowbase;
-    for (int i = 0; i < can.m_frame.can_dlc; i++) {
-        os<<std::uppercase<<std::hex<<" "<<std::setw(2)<< (int)can.m_frame.data[i];
+    for (int i = 0; i < can.getCanFrame().can_dlc; i++) {
+        os<<std::uppercase<<std::hex<<" "<<std::setw(2)<< (int)can.getCanFrame().data[i];
     }
     os<<std::nouppercase;
 

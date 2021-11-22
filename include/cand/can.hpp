@@ -19,10 +19,6 @@ class CAN{
         struct can_frame m_frame;
         std::string m_interfaceName;
 
-        friend CAN& operator<<(CAN&, struct can_frame *);
-        friend std::ostream& operator<<(std::ostream&,CAN&);
-
-
     public:
         CAN(std::string name);
 
@@ -30,4 +26,11 @@ class CAN{
 
         void socket_close();
 
+        struct can_frame getCanFrame();
+        int getFileDescriptor();
+        void setCanFrame(struct can_frame frame);
+
 };
+
+CAN& operator<<(CAN&, struct can_frame *);
+std::ostream& operator<<(std::ostream&,CAN&);
