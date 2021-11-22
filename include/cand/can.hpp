@@ -1,8 +1,7 @@
+#pragma once
 #include <iostream>
 #include <iomanip> 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstring>
 #include <string>
 #include <unistd.h>
 
@@ -13,27 +12,22 @@
 #include <linux/can.h>
 #include <linux/can/raw.h>
 
-#ifndef LINUX_CAN_H
-#define LINUX_CAN_H
-
 class CAN{
     private:
 
-        int file_descriptor;
-        struct can_frame frame;
-        std::string interface_name;
+        int m_fileDescriptor;
+        struct can_frame m_frame;
+        std::string m_interfaceName;
 
         friend CAN& operator<<(CAN&, struct can_frame *);
+        friend std::ostream& operator<<(std::ostream&,CAN&);
 
 
     public:
         CAN(std::string name);
 
-        int socket_write(struct can_frame *);
+        void socket_write(struct can_frame *);
 
-        int socket_close();
+        void socket_close();
 
 };
-std::ostream& operator<<(std::ostream&,struct can_frame&);
-
-#endif 

@@ -1,88 +1,71 @@
 #include "cand/can.hpp"
 
-CAN::CAN(std::string name):interface_name{name} {
+CAN::CAN(std::string name):m_interfaceName{name} {
 
-    int s; 
+    int socketCan; 
     struct sockaddr_can addr;
     struct ifreq ifr;
 
-    if ((s = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
-        perror("Socket initialization error");
-        return;
+    if ((socketCan = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
+        throw std::runtime_error("Socket initialization error");
     }
 
-    interface_name.copy(ifr.ifr_name, interface_name.length(), 0);
-    ioctl(s, SIOCGIFINDEX, &ifr);
+    m_interfaceName.copy(ifr.ifr_name, m_interfaceName.length(), 0);
+    ioctl(socketCan, SIOCGIFINDEX, &ifr);
 
-    memset(&addr, 0, sizeof(addr));
+    std::memset(&addr, 0, sizeof(addr));
     addr.can_family = AF_CAN;
     addr.can_ifindex = ifr.ifr_ifindex;
 
-    if (bind(s, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-        perror("Binding error");
-        return;
+    if (bind(socketCan, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+        throw std::runtime_error("Binding error");
     }
 
-    file_descriptor = s;
+    m_fileDescriptor = socketCan;
 
 }
         
-int CAN::socket_write (struct can_frame *frame) {
+void CAN::socket_write (struct can_frame *frame) {
 
-    try{
-        int vl = write(file_descriptor, frame, sizeof(struct can_frame));
-        if(vl<0){
-            throw vl;
-        }
-    }catch(int ex){
-        std::cerr<<"Write error";
-        return 1;
+    int vl = write(m_fileDescriptor, frame, sizeof(struct can_frame));
+    if(vl<0){
+        throw std::runtime_error("Write error");
     }
-
-    return 0;
 
 }
 CAN& operator<<(CAN& can,struct can_frame *frame) {
 
     int nbytes;
-    try{
-        nbytes = read(can.file_descriptor, frame, sizeof(struct can_frame));
-        throw nbytes;
-    }catch(int ex){
-        if (nbytes < 0) {
-            std::cerr<<"Read error";
-        }	
+    nbytes = read(can.m_fileDescriptor, frame, sizeof(struct can_frame));
+    if (nbytes < 0) {
+        throw std::runtime_error("Read error");
+    }	
 
-        if (nbytes < sizeof(struct can_frame)) {
-            std::cerr<<"Read: incomplete CAN frame"<<std::endl;
-        }
+    if (nbytes < sizeof(struct can_frame)) {
+        throw std::runtime_error("Read: Incomplete CAN frame");
     }
+
+    can.m_frame=(*frame);
+
     return can;
 
 }
 
-int CAN::socket_close () {
+void CAN::socket_close () {
 
-    try{
-        int vl = close(file_descriptor);
-        if(vl<0){
-            throw vl;
-        }
-    }catch(int ex){
-        std::cerr<<"Closing error";
-        return 1;
+    int vl = close(m_fileDescriptor);
+    if(vl<0){
+        throw std::runtime_error("Closing error");
     }
-
-    return 0;
 
 }
 
-std::ostream& operator<<(std::ostream& os,struct can_frame& frame){
-    os<<std::hex<<std::showbase<<(int)frame.can_id<<" [";
-    os<<std::dec<<(int)frame.can_dlc<<"]";
+std::ostream& operator<<(std::ostream& os,CAN& can){
+    os<<std::hex<<std::showbase<<(int)can.m_frame.can_id<<" [";
+    os<<std::dec<<(int)can.m_frame.can_dlc<<"]";
     os<<std::noshowbase;
-    for (int i = 0; i < frame.can_dlc; i++) {
-        os<<std::uppercase<<std::hex<<" "<<std::setw(2)<< (int)frame.data[i];
+    for (int i = 0; i < can.m_frame.can_dlc; i++) {
+        os<<std::uppercase<<std::hex<<" "<<std::setw(2)<< (int)can.m_frame.data[i];
     }
     os<<std::nouppercase;
 

@@ -10,7 +10,7 @@ int main () {
     while (1) {
 
         can<<(&frame);
-        std::cout<<frame;
+        std::cout<<can;
 
     }
 
