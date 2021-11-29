@@ -22,7 +22,7 @@ class CAN{
     public:
         CAN(std::string name);
 
-        void socket_write(struct can_frame *);
+        void socket_write(struct can_frame&);
 
         void socket_close();
 
@@ -32,5 +32,5 @@ class CAN{
 
 };
 
-CAN& operator<<(CAN&, struct can_frame *);
+CAN& operator<<(CAN&, struct can_frame&);
 std::ostream& operator<<(std::ostream&,CAN&);

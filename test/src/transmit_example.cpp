@@ -19,7 +19,7 @@ int main () {
         
         }
 
-        can.socket_write(&frame);
+        can.socket_write(frame);
 
     }
 

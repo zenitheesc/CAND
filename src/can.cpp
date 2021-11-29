@@ -34,18 +34,18 @@ void CAN::setCanFrame(struct can_frame frame){
     this->m_frame=frame;
 }
         
-void CAN::socket_write (struct can_frame *frame) {
+void CAN::socket_write (struct can_frame& frame) {
 
-    int vl = write(m_fileDescriptor, frame, sizeof(struct can_frame));
+    int vl = write(m_fileDescriptor, &frame, sizeof(struct can_frame));
     if(vl<0){
         throw std::runtime_error("Write error");
     }
 
 }
-CAN& operator<<(CAN& can,struct can_frame *frame) {
+CAN& operator<<(CAN& can,struct can_frame& frame) {
 
     int nbytes;
-    nbytes = read(can.getFileDescriptor(), frame, sizeof(struct can_frame));
+    nbytes = read(can.getFileDescriptor(), &frame, sizeof(struct can_frame));
     if (nbytes < 0) {
         throw std::runtime_error("Read error");
     }	
@@ -54,7 +54,7 @@ CAN& operator<<(CAN& can,struct can_frame *frame) {
         throw std::runtime_error("Read: Incomplete CAN frame");
     }
 
-    can.setCanFrame(*frame);
+    can.setCanFrame(frame);
 
     return can;
 
@@ -62,8 +62,7 @@ CAN& operator<<(CAN& can,struct can_frame *frame) {
 
 void CAN::socket_close () {
 
-    int vl = close(m_fileDescriptor);
-    if(vl<0){
+    if(close(m_fileDescriptor)<0){
         throw std::runtime_error("Closing error");
     }
 
