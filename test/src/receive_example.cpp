@@ -3,18 +3,15 @@
 int main () {
 
     struct can_frame frame;
-    std::string can_name = "vcan0";
 
-    CAN can(can_name);
+    CAN can("vcan0");
 
     while (1) {
 
-        can<<frame;
-        std::cout<<can;
+        can>>frame;
+        std::cout<<frame;
 
     }
-
-    can.socket_close();
 
     return 0;
 

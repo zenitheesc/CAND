@@ -3,9 +3,7 @@
 int main () {
 
     struct can_frame frame;
-
-    std::string can_name = "vcan0";
-    CAN can(can_name);
+    CAN can("vcan0");
 
     for (__uint8_t i = 0; i < 20; i++) {
 
@@ -19,12 +17,9 @@ int main () {
         
         }
 
-        can.socket_write(frame);
+        can<<frame;
 
     }
 
-    can.socket_close();
-
     return 0;
-
 }

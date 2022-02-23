@@ -1,9 +1,10 @@
 #pragma once
-#include <iostream>
-#include <iomanip> 
 #include <cstring>
+#include <iomanip>
+#include <iostream>
 #include <string>
 #include <unistd.h>
+#include <vector>
 
 #include <net/if.h>
 #include <sys/ioctl.h>
@@ -12,25 +13,24 @@
 #include <linux/can.h>
 #include <linux/can/raw.h>
 
-class CAN{
-    private:
+class CAN {
+private:
+    int m_fileDescriptor;
+    std::string m_interfaceName;
 
-        int m_fileDescriptor;
-        struct can_frame m_frame;
-        std::string m_interfaceName;
+public:
+    CAN(std::string name);
+    ~CAN();
 
-    public:
-        CAN(std::string name);
+    void socketWrite(struct can_frame&);
 
-        void socket_write(struct can_frame&);
+    void socket_close();
 
-        void socket_close();
+    int getFileDescriptor();
 
-        struct can_frame getCanFrame();
-        int getFileDescriptor();
-        void setCanFrame(struct can_frame frame);
-
+    void setFilter(struct can_filter);
 };
 
-CAN& operator<<(CAN&, struct can_frame&);
-std::ostream& operator<<(std::ostream&,CAN&);
+const CAN& operator<<(CAN&, struct can_frame&);
+const struct can_frame& operator>>(CAN&, struct can_frame&);
+std::ostream& operator<<(std::ostream&, struct can_frame&);
