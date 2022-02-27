@@ -24,8 +24,6 @@ public:
 
     void socketWrite(struct can_frame&);
 
-    void socket_close();
-
     int getFileDescriptor();
 
     void setFilter(struct can_filter);
