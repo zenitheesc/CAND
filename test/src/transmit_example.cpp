@@ -3,7 +3,7 @@
 int main () {
 
     struct can_frame frame;
-    CAN can("vcan0");
+    CAN can{"vcan0"};
 
     for (__uint8_t i = 0; i < 20; i++) {
 

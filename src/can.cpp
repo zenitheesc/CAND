@@ -33,16 +33,14 @@ CAN::~CAN()
     }
 }
 
-int CAN::getFileDescriptor()
+auto CAN::getFileDescriptor() const -> int
 {
     return m_fileDescriptor;
 }
 
 void CAN::socketWrite(struct can_frame& frame)
 {
-
-    int vl = write(m_fileDescriptor, &frame, sizeof(struct can_frame));
-    if (vl < 0) {
+    if (write(m_fileDescriptor, &frame, sizeof(struct can_frame)) < 0) {
         throw std::runtime_error("Write error");
     }
 }

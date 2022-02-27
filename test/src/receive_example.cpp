@@ -4,7 +4,7 @@ int main () {
 
     struct can_frame frame;
 
-    CAN can("vcan0");
+    CAN can{"vcan0"};
 
     while (1) {
 
