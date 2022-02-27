@@ -12,7 +12,7 @@ CAN::CAN(std::string name)
         throw std::runtime_error("Socket initialization error");
     }
 
-    strcpy(ifr.ifr_name, m_interfaceName.c_str());
+    strncpy(ifr.ifr_name, m_interfaceName.c_str(), sizeof(ifr.ifr_name));
     ioctl(socketCan, SIOCGIFINDEX, &ifr);
 
     std::memset(&addr, 0, sizeof(addr));
