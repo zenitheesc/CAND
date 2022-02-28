@@ -19,14 +19,14 @@ private:
     std::string m_interfaceName;
 
 public:
-    CAN(std::string name);
+    CAN(const std::string&);
     ~CAN();
 
-    void socketWrite(struct can_frame&);
+    void socketWrite(const struct can_frame&);
 
     auto getFileDescriptor() const -> int;
 
-    void setFilter(struct can_filter);
+    void setFilter(const struct can_filter&);
 };
 
 const CAN& operator<<(CAN&, struct can_frame&);
