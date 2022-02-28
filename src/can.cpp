@@ -1,6 +1,6 @@
 #include "cand/can.hpp"
 
-CAN::CAN(std::string name)
+CAN::CAN(const std::string& name)
     : m_interfaceName { name }
 {
 
@@ -38,14 +38,14 @@ auto CAN::getFileDescriptor() const -> int
     return m_fileDescriptor;
 }
 
-void CAN::socketWrite(struct can_frame& frame)
+void CAN::socketWrite(const struct can_frame& frame)
 {
     if (write(m_fileDescriptor, &frame, sizeof(struct can_frame)) < 0) {
         throw std::runtime_error("Write error");
     }
 }
 
-void CAN::setFilter(struct can_filter filter)
+void CAN::setFilter(const struct can_filter& filter)
 {
     if (setsockopt(m_fileDescriptor, SOL_CAN_RAW, CAN_RAW_FILTER, &filter, sizeof(filter)) < 0) {
         setsockopt(m_fileDescriptor, SOL_CAN_RAW, CAN_RAW_FILTER, NULL, 0);
