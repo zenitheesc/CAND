@@ -9,7 +9,7 @@ CAN::CAN(const std::string& name)
     struct ifreq ifr;
 
     if ((socketCan = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
-        throw std::runtime_error("Socket initialization error");
+        throw std::runtime_error("Socket initialization error: " + std::string(strerror(errno)));
     }
 
     strncpy(ifr.ifr_name, m_interfaceName.c_str(), sizeof(ifr.ifr_name));
@@ -20,7 +20,7 @@ CAN::CAN(const std::string& name)
     addr.can_ifindex = ifr.ifr_ifindex;
 
     if (bind(socketCan, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-        throw std::runtime_error("Binding error");
+        throw std::runtime_error("Binding error: " + std::string(strerror(errno)));
     }
 
     m_fileDescriptor = socketCan;
@@ -41,7 +41,7 @@ auto CAN::getFileDescriptor() const -> int
 void CAN::socketWrite(const struct can_frame& frame)
 {
     if (write(m_fileDescriptor, &frame, sizeof(struct can_frame)) < 0) {
-        throw std::runtime_error("Write error");
+        throw std::runtime_error("Write error: " + std::string(strerror(errno)));
     }
 }
 
@@ -49,7 +49,7 @@ void CAN::setFilter(const struct can_filter& filter)
 {
     if (setsockopt(m_fileDescriptor, SOL_CAN_RAW, CAN_RAW_FILTER, &filter, sizeof(filter)) < 0) {
         setsockopt(m_fileDescriptor, SOL_CAN_RAW, CAN_RAW_FILTER, NULL, 0);
-        throw std::runtime_error("Filter error");
+        throw std::runtime_error("Filter error: " + std::string(strerror(errno)));
     }
 }
 
