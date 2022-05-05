@@ -1,0 +1,42 @@
+{
+    "proxys": {"Main Routine": {}},
+    "can_bus_id" : "vcan0",
+    "actions": {
+        "0X0D0": {
+            "when": {
+                "id": 208,
+                "__comment__": "208 = 0x0D0",
+                "times": 1
+            },
+            "do": {
+                "servidor" :    {
+                    "who": "servidor",
+                    "method": "getCurrJson",
+                    "answer": {
+                        "start_id": 209,
+                        "max_id": null
+                    },
+                    "__comment__": "209 = 0x0D1"
+                }
+            }
+        },
+        "0x0F5": {
+            "when": {
+                "id": 245,
+                "__comment__": "245 = 0x0F5",
+                "times": 1
+            },
+            "do": {
+                "cand": {
+                    "who": "cand",
+                    "method": "heartbeat",
+                    "answer": {
+                        "start_id": 247,
+                        "max_id": null
+                    },
+                    "__comment__": "247 = 0x0F7"
+                }
+            }
+        }
+    }
+}
