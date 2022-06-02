@@ -3,11 +3,14 @@ set(sources
 )
 
 set(exe_sources
-		${sources}
+	${sources}
+    src/cand.cpp
 )
 
 set(headers
     include/cand/can.hpp
+    include/cand/cand.hpp
+    include/cand/functions.hpp
 )
 
 set(test_sources
